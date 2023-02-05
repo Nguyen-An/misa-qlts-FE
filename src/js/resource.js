@@ -30,7 +30,10 @@ export default {
       Confirm: "Xác nhận",
       NotNull: "không được để trống",
       ConfirmDelete: "Xác nhận xóa các tài sản đã chọn",
-      Loading: "loading"
+      NotValueDelete: "Hãy chọn ít nhất một tài sản",
+      Validate: "Vui lòng nhập trường này",
+      AddFall: "Thêm mới thất bại",
+      Loading: "loading",
     },
     Tooltip: {
       SerialTooltip: "Số thứ tự",

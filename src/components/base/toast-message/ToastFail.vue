@@ -10,7 +10,7 @@
 <script>
 import Resource from "@/js/resource.js";
 export default {
-    name: "toastDelete",
+    name: "ToastFail",
     data() {
       return {
         Title: Resource.Title, //Tiêu đề gọi từ file resource.js

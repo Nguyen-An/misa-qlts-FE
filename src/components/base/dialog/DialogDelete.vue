@@ -8,7 +8,7 @@
         <div class="container__right">
           <div class="container__content">
             <div class="validate-items">
-              <div class="validate-item">{{ ContentText.ConfirmDelete }}</div>
+              <div class="validate-item">{{ Title }}</div>
             </div>
           </div>
           <div class="container__footer">
@@ -33,17 +33,28 @@ export default {
   name: "dialogDelete",
   components: {},
   props: {
-    // chế độ của prop
+    // chế độ của prop 
     modeDelete: Number,
   },
   data() {
     return {
       ContentText: Resource.ContentText, //Table content gọi từ file resource.js
       mode: 6,
+      Title: "", // nôi dung dialog
     };
   },
   created() {
     this.mode = this.modeDelete;
+
+    switch (this.mode) {
+      case Enum.Mode.ValueEmpty:
+        this.Title = this.ContentText.NotValueDelete;
+        break;
+    
+      default:
+        this.Title = this.ContentText.ConfirmDelete;
+        break;
+    }
   },
   methods: {
     /**
@@ -61,12 +72,15 @@ export default {
     deleteData() {
       switch (this.mode) {
         case Enum.Mode.ModeDeleteOne:
-            this.$emit("onDeleteConfirmOne");
-          
+          this.$emit("onDeleteConfirmOne");
           break;
 
         case Enum.Mode.ModeDelete:
-            this.$emit("onDeleteConfirm");
+          this.$emit("onDeleteConfirm");
+          break;
+        
+        case Enum.Mode.ValueEmpty:
+          this.$emit("onDeleteConfirm");
           break;
 
         default:
@@ -104,6 +118,7 @@ export default {
   top: calc((100vh - 300px) / 2);
   right: calc((100vw - 500px) / 2);
   left: calc((100vw - 500px) / 2);
+  border-radius: 6px;
   position: fixed;
   z-index: 100;
   overflow: hidden;
@@ -137,7 +152,7 @@ export default {
 }
 
 .icon-warning {
-  background: url("../../assets/icon/qlts-icon.png") no-repeat -824px -130px;
+  background: url("../../../assets/icon/qlts-icon.png") no-repeat -824px -130px;
   background-size: 1000px 1500px;
   width: 48px;
   height: 40px;
@@ -153,7 +168,7 @@ export default {
 .btn-cancer {
   width: 100px;
   height: 36px;
-  line-height: 36px;
+  line-height: 34px;
   text-align: center;
   background-color: #fff;
   border-radius: 2px;
@@ -171,7 +186,7 @@ export default {
 .btn-submit {
   width: 100px;
   height: 36px;
-  line-height: 36px;
+  line-height: 34px;
   text-align: center;
   background-color: #1aa4c8;
   border-radius: 2px;

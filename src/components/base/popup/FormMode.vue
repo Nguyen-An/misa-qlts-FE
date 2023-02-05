@@ -4,43 +4,40 @@
       <div class="form-add__container">
         <div class="form-add__container__head">
           <div class="form-add__container__head__title">{{ TheTitle }}</div>
-          <div
-            @click="hidenForm"
-            class="icon-close"
-            :title="Tooltip.Close"
-          ></div>
+          <div @click="hidenForm" class="icon-close" :title="Tooltip.Close"></div>
         </div>
         <div class="form-add__container__body">
           <form class="form" id="form-1">
             <div class="form-row">
-              <div class="form-group col1-3">
-                <label for="fname"
-                  >{{ ContentText.FixedAssetCode }}
+              <div :class="{'form-group col1-3': true, invalid: objectValidateForm.fixedAssetCode}">
+                <input type="text" ref="ipForCusStart" style="width: 0px; height: 0px; border: none;">
+                <label for="fname">
+                  {{ ContentText.FixedAssetCode }}
                   <span class="cl-red">{{ ContentText.red }}</span>
                 </label>
                 <input
                   @blur="blurValidate($event)"
-                  @input="inputValide($event)"
-                  id="AssetCode"
+                  ref="fixedAssetCode"
+                  id="fixedAssetCode"
                   class="form-control"
                   type="text"
                   name="fname"
                   v-model="FixedAsset.fixedAssetCode"
                   :placeholder="Placeholder.ImportAssetCode"
-                  maxlength="100"
+                  maxlength="50"
                   autocomplete="off"
                 />
-                <div class="form-message"></div>
+                <div class="form-message"><span v-if="objectValidateForm.fixedAssetCode">{{ ContentText.Validate }}</span></div>
               </div>
-              <div class="form-group col2-3">
+              <div :class="{'form-group col2-3': true, invalid: objectValidateForm.fixedAssetName}">
                 <label for="fname"
                   >{{ ContentText.FixedAssetName }}
                   <span class="cl-red">{{ ContentText.red }}</span>
                 </label>
                 <input
                   @blur="blurValidate($event)"
-                  @input="inputValide($event)"
-                  id="AssetName"
+                  ref="fixedAssetName"
+                  id="fixedAssetName"
                   class="form-control"
                   type="text"
                   name="fname"
@@ -49,46 +46,19 @@
                   maxlength="255"
                   autocomplete="off"
                 />
-                <div class="form-message"></div>
+                <div class="form-message"><span v-if="objectValidateForm.fixedAssetName">{{ ContentText.Validate }}</span></div>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group col1-3">
+              <div :class="{'form-group col1-3': true, invalid: objectValidateForm.departmentId}">
                 <label for="fname"
                   >{{ ContentText.DepartmentCode }}
                   <span class="cl-red">{{ ContentText.red }}</span></label
                 >
-                <div class="col-select">
-                  <input
-                    @click="showOption($event)"
-                    id="PartCode"
-                    class="option-filter__content"
-                    :placeholder="Placeholder.ImportDepartmentCode"
-                    :value="getPartCodeByDepartmentId(FixedAsset.departmentId)"
-                    readonly
-                  />
-                  <div
-                    class="icon-down select-option"
-                    @click="showOption($event)"
-                  ></div>
-                  <div class="option-filter-items">
-                    <div
-                      class="option-filter-item"
-                      ref="optionFilteritem"
-                      v-for="(department, index) in Departments"
-                      :key="index"
-                      @click="
-                        changeOptionPart(
-                          $event,
-                          department.departmentName,
-                          department.departmentId
-                        )
-                      "
-                    >
-                      <b>{{department.departmentCode}}</b> - {{ department.departmentName }}
-                    </div>
-                  </div>
+                <div class="col-select form-control padding-0">
+                  <input-filter-form :modeFilter="2" :valueFirst="FixedAsset.departmentId" @filter="importDepartment"/>
                 </div>
+                <div class="form-message"><span v-if="objectValidateForm.departmentId">{{ ContentText.Validate }}</span></div>
               </div>
               <div class="form-group col2-3">
                 <label for="fname">{{ ContentText.DepartmentName }} </label>
@@ -100,51 +70,21 @@
                   :value="getPartNameByDepartmentId(FixedAsset.departmentId)"
                   placeholder=""
                   readonly
+                  disabled
                   autocomplete="off"
                 />
-                <div class="form-message"></div>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group col1-3">
+              <div :class="{'form-group col1-3': true, invalid: objectValidateForm.fixedAssetCategoryId}">
                 <label for="fname"
                   >{{ ContentText.FixedAssetCategoryCode }}
                   <span class="cl-red">{{ ContentText.red }}</span>
                 </label>
-                <div class="col-select">
-                  <input
-                    @click="showOption($event)"
-                    class="option-filter__content"
-                    :placeholder="Placeholder.ImportCategoryAssetCode"
-                    :value="
-                      getTypeAssetCodeByFixedAssetCategoryId(
-                        FixedAsset.fixedAssetCategoryId
-                      )
-                    "
-                    readonly
-                  />
-                  <div
-                    class="icon-down select-option"
-                    @click="showOption($event)"
-                  ></div>
-                  <div class="option-filter-items">
-                    <div
-                      class="option-filter-item"
-                      ref="optionFilteritem"
-                      v-for="(assetCategory, index) in AssetCategorys"
-                      :key="index"
-                      @click="
-                        changeOptionTypeAsset(
-                          $event,
-                          assetCategory.fixedAssetCategoryName,
-                          assetCategory.fixedAssetCategoryId
-                        )
-                      "
-                    >
-                      <b>{{assetCategory.fixedAssetCategoryCode}}</b> - {{ assetCategory.fixedAssetCategoryName }}
-                    </div>
-                  </div>
+                <div class="col-select form-control padding-0">
+                  <input-filter-form :modeFilter="1" :valueFirst="FixedAsset.fixedAssetCategoryId" @filter="importFixedAssetCode"/>
                 </div>
+                <div class="form-message"><span v-if="objectValidateForm.fixedAssetCategoryId">{{ ContentText.Validate }}</span></div>
               </div>
               <div class="form-group col2-3">
                 <label for="fname">{{
@@ -155,111 +95,111 @@
                   class="form-control bg-ccc"
                   type="text"
                   name="fname"
-                  :value="
-                    getTypeAssetNameByFixedAssetCategoryId(
-                      FixedAsset.fixedAssetCategoryId
-                    )
-                  "
+                  :value="getTypeAssetNameByFixedAssetCategoryId(FixedAsset.fixedAssetCategoryId)"
                   readonly
+                  disabled
                   placeholder=""
                   autocomplete="off"
                 />
-                <div class="form-message"></div>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group col1-3">
+              <div :class="{'form-group col1-3': true, invalid: objectValidateForm.quantity}">
                 <label for="fname"
                   >{{ ContentText.Quantity }}
                   <span class="cl-red">{{ ContentText.red }}</span>
                 </label>
-                <div class="out-ip">
+                <div class="input-number">
                   <input
-                    class="form-control text-align-right padding-right-20"
-                    type="text"
-                    name="fname"
-                    v-model="FixedAsset.quantity"
-                    maxlength="5"
-                    autocomplete="off"
+                  class="form-control text-align-right padding-right-32"
+                  type="number"
+                  max="99999"
+                  min="0"
+                  @blur="blurValidateNumber($event)"
+                  id="quantity"
+                  @input="importQuantity($event)"
+                  v-model="FixedAsset.quantity"
+                  autocomplete="off"
                   />
-                  <div class="icon-UpAndDown">
-                    <div class="icon-up"></div>
-                    <div class="icon-down"></div>
-                  </div>
+                  <div class="icon-UpAndDown"></div>
                 </div>
-                <div class="form-message"></div>
+                <div class="form-message"><span v-if="objectValidateForm.quantity">{{ ContentText.Validate }}</span></div>
               </div>
               <div class="form-group col1-3 form-group col1-3-center">
                 <label for="fname"
-                  >{{ ContentText.Cost }}
-                  <span class="cl-red">{{ ContentText.red }}</span>
+                  >{{ ContentText.Cost }} <span class="cl-red">{{ ContentText.red }}</span>
                 </label>
-                <input
-                  class="form-control text-align-right padding-right-20"
-                  ref="cost"
-                  type="text"
-                  name="fname"
-                  @keyup="importCost"
-                  value="0"
-                  maxlength="25"
-                  autocomplete="off"
-                />
+                <div :class="{'input-money': true, active_ip: objectValidateForm.cost}">
+                  <inputMoney :value="FixedAsset.cost" :modeInput="1" @changeCost="importCost" @blurInput="blurValidateComponentCost()" /> 
+                </div>
+                <div class="form-message"><span v-if="objectValidateForm.cost">{{ ContentText.Validate }}</span></div>
               </div>
-              <div class="form-group col1-3">
+              <div :class="{'form-group col1-3': true, invalid: objectValidateForm.lifeTime}">
                 <label for="fname"
                   >{{ ContentText.LifeTime }}
                   <span class="cl-red">{{ ContentText.red }}</span>
                 </label>
                 <input
                   class="form-control text-align-right padding-right-20"
+                  type="number"
+                  v-model="FixedAsset.lifeTime"
+                  max="100"
+                  min="0"
+                  @blur="blurValidateNumber($event)"
+                  id="lifeTime"
+                  @input="importLifeTime($event)"
+                  autocomplete="off"
+                  />
+                <!-- <input
+                  class="form-control text-align-right padding-right-20"
                   type="text"
                   name="fname"
                   v-model="FixedAsset.lifeTime"
                   maxlength="3"
                   autocomplete="off"
-                />
+                /> -->
+                <div class="form-message"><span v-if="objectValidateForm.lifeTime">{{ ContentText.Validate }}</span></div>
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group col1-3">
+              <div :class="{'form-group col1-3': true, invalid: objectValidateForm.depreciationRate}">
                 <label for="fname"
-                  >{{ ContentText.DepreciationRate
-                  }}<span class="cl-red">{{ ContentText.red }}</span>
+                  >{{ ContentText.DepreciationRate}}<span class="cl-red">{{ ContentText.red }}</span>
                 </label>
-                <input
-                  class="form-control text-align-right padding-right-20"
-                  type="text"
-                  name="fname"
+                <div class="input-number">
+                  <input
+                  class="form-control text-align-right padding-right-32"
+                  type="number"
                   v-model="FixedAsset.depreciationRate"
-                  maxlength="6"
+                  max="100"
+                  min="0"
+                  @blur="blurValidateNumber($event)"
+                  id="depreciationRate"
+                  @input="importDepreciationRate($event)"
                   autocomplete="off"
-                />
-                <div class="form-message"></div>
+                  />
+                  <div class="icon-UpAndDown"></div>
+                </div>
+                <div class="form-message"><span v-if="objectValidateForm.depreciationRate">{{ ContentText.Validate }}</span></div>
               </div>
               <div class="form-group col1-3 form-group col1-3-center">
                 <label for="fname"
                   >{{ ContentText.ValueAtrophyYear }}
                   <span class="cl-red">{{ ContentText.red }}</span>
                 </label>
-                <input
-                  class="form-control text-align-right padding-right-20"
-                  type="text"
-                  ref="valueAtrophyYear"
-                  name="fname"
-                  @keyup="importValueAtrophyYear"
-                  :value="0"
-                  maxlength="25"
-                  autocomplete="off"
-                />
-                <!-- @input="handleInputValueAtrophyYear" -->
+                <div :class="{'input-money': true, active_ip: objectValidateForm.valueAtrophyYear}">
+                  <inputMoney :value="FixedAsset.valueAtrophyYear" :modeInput="2" @blurInput="blurValidateComponentValueAtrophyYear()" @changevalueAtrophyYear="importValueAtrophyYear"/>
+                </div>
+                <div class="form-message"><span v-if="objectValidateForm.valueAtrophyYear">{{ ContentText.Validate }}</span></div>
               </div>
               <div class="form-group col1-3">
                 <label for="fname">{{ ContentText.TrackedYear }} </label>
                 <input
                   class="form-control bg-ccc text-align-right padding-right-20"
-                  type="text"
+                  type="number"
                   name="fname"
                   readonly
+                  disabled
                   v-model="FixedAsset.trackedYear"
                   autocomplete="off"
                 />
@@ -276,9 +216,12 @@
                   placeholder="dd/mm/yyyy"
                   class="date-picker"
                   hideInputIcon
+                  vertical
                   selectText="Chọn"
                   cancelText="Đóng"
                   format="dd/MM/yyyy"
+                  previewFormat="dd/MM/yyyy"
+                  arrow-navigation
                   :clearable="false"
                   :enableTimePicker="false"
                 ></Datepicker>
@@ -300,12 +243,16 @@
                 <Datepicker
                   v-model="FixedAsset.useDate"
                   class="date-picker"
+                  text-input
+                  hideInputIcon
+                  vertical
                   selectText="Chọn"
                   cancelText="Đóng"
                   format="dd/MM/yyyy"
+                  previewFormat="dd/MM/yyyy"
+                  arrow-navigation
                   :clearable="false"
                   :enableTimePicker="false"
-                  hideInputIcon
                   ref="useDatePicker"
                 ></Datepicker>
                 <!--  -->
@@ -320,19 +267,21 @@
           </form>
         </div>
         <div class="form-add__container__foot">
-          <div @click="addData" type="sub" class="btn-submit">
-            {{ ContentText.Save }}
-          </div>
-          <div @click="canceForm" type="submit" class="btn-cancel">
+          <button @click="canceForm" type="submit" class="btn-cancel">
             {{ ContentText.Cancer }}
-          </div>
+          </button>
+          <button @click="addData" @keydown.tab="onTab()" type="submit" class="btn-submit">
+            {{ ContentText.Save }}
+          </button> 
+          <input type="text" ref="ipForCusEnd" style="width: 0px; height: 0px; border: none;">
         </div>
       </div>
     </div>
     <dialog-validate
       v-if="isShowDialogValidate"
       :validateItems="validateItems"
-      :isShowDialogValidate="isShowDialogValidate"
+      :modeRequest="modeRequest"
+      @closeDialog="closeDialogValidate()"
     />
     <dialogCance v-if="isShowDialogCance" />
   </div>
@@ -342,16 +291,19 @@
 import axios from "axios";
 import Enum from "@/js/enum.js";
 import Resource from "@/js/resource.js";
-// import EnumDTO from "@/js/enumDTO.js";
+import { ObjectValidateForm } from "@/class/ObjectValidateForm.js";
 import { FixedAsset } from "@/class/FixedAsset.js";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
-import dialogValidate from "@/components/dialog/dialogValidate.vue";
-import dialogCance from "@/components/dialog/dialogCance.vue";
+import dialogValidate from "@/components/base/dialog/DialogValidate";
+import dialogCance from "@/components/base/dialog/DialogCance";
+import inputMoney from '@/components/base/popup/InputMoney'
+import inputFilterForm from '@/components/base/popup/InputFilterForm'
+// import inputNumber from '@/components/base/popup/InputNumber'
 
 export default {
-  name: "formMode",
-  components: { Datepicker, dialogValidate, dialogCance },
+  name: "FormMode",
+  components: { Datepicker, dialogValidate, dialogCance, inputMoney, inputFilterForm },
   props: {
     // Chế độ của popup
     mode: Number,
@@ -365,6 +317,7 @@ export default {
       Placeholder: Resource.Placeholder, //Placeholder gọi từ file resource.js
       Tooltip: Resource.Tooltip, //Tooltip gọi từ file resource.js
       FixedAsset: new FixedAsset(), // Đối tượng tài sản sẽ nhận data từ form
+      objectValidateForm: new ObjectValidateForm(), // Đối tượng validate gọi từ form
       TheTitle: "", // Tiêu đề của form
       AssetCategorys: [], // Danh sách loại tìa sản lấy từ API
       Departments: [], // Danh sách bộ phận sử dụng lấy từ API
@@ -373,7 +326,8 @@ export default {
       validateItemss: [], // Mảng các trường chưa nhập cần validate(cảnh báo)
       assetCodeAuto: "", // Mã tài sản tự động lấy được
       valueAtrophyYearBefor: "0", //Giá trị của giá trị hao mòn năm trước lúc nhập (trước khi bắt keyup)
-      costBefor: "0", // Giá trị của nguyên giá trước lúc nhập (trước khi bắt keyup)
+      modeInput: 0, //
+      modeRequest: 0, // Chế độ khi yêu cầu
     };
   },
   created() {
@@ -408,24 +362,6 @@ export default {
           this.CreateFormUpdate(this.updateAsset);
 
           break;
-        case Enum.Mode.Duplicate:
-          // Thiết lập title popup thành Sửa tài sản
-          this.TheTitle = this.ContentText.AddAsset;
-
-          // Truyền giá trị tài sản ban đầu vào form
-          this.CreateFormDuplicate(this.duplicateAsset);
-
-          // Lấy mã mới cho trường tài sản
-          fetch("http://localhost:63515/api/v1/Assets/new-code")
-            .then((response) => {
-              return response.json();
-            })
-            .then((AssetCodeAuto) => {
-              this.assetCodeAuto = AssetCodeAuto.newAssetCode;
-              this.FixedAsset.fixedAssetCode = this.assetCodeAuto;
-            });
-          
-          break;
         default:
           // Thiết lập title popup thành Thêm tài sản
           this.TheTitle = this.ContentText.AddAsset;
@@ -446,17 +382,32 @@ export default {
       console.log(error);
     }
   },
+  updated(){
+    try {
+      this.FixedAsset.trackedYear = this.FixedAsset.useDate.getFullYear();
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  beforeMount(){
+    let _this = this;
+
+    // Tự động focus ô mã tài sản khi mở form
+    this.$nextTick(() => _this.$refs.fixedAssetCode.focus());
+  },
   methods: {
+    /**
+     * Hàm bắt sự kiện tab khi đến ô cuối cùng => chuyển đến mã tài sản
+     * Tạo bởi: NVAn(20/12/2022)
+     */
+    onTab(){
+      this.$refs.ipForCusStart.focus();
+    },
+
     handleClickUserDatePicker() {
       let datepicker = this.$refs.useDatePicker;
       datepicker.openMenu();
     },
-    // Hàm cảu input Linh
-    // handleInputValueAtrophyYear(e) {
-    //   e.target.value = e.target.value.toString()
-    //     .replace(/\D/g, "")
-    //     .replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-    // },
 
     /**
      * Hàm Load data
@@ -499,12 +450,7 @@ export default {
      * Tạo bởi: NVAn(20/12/2022)
      */
     formatCash(str) {
-      return str
-        .split("")
-        .reverse()
-        .reduce((prev, next, index) => {
-          return (index % 3 ? next : next + ".") + prev;
-        })
+      return str.split("").reverse().reduce((prev, next, index) => {return (index % 3 ? next : next + ".") + prev;});
     },
 
     /**
@@ -518,17 +464,57 @@ export default {
 
     //Xử lý sự kiện khi blur vào ô input (ẩn hiện message validate)
     blurValidate(e) {
-      let errorElement = e.target.parentElement.querySelector(".form-message");
-      let inputElement = e.target.parentElement.querySelector("input");
-      let errorMessage = e.target.parentElement.querySelector("input").value.trim() 
-        ? undefined
-        : "Vui lòng nhập trường này";
-      if (errorMessage) {
-        errorElement.innerText = errorMessage;
-        inputElement.parentElement.classList.add("invalid");
-      } else {
-        errorElement.innerText = "";
-        inputElement.parentElement.classList.remove("invalid");
+      //lấy thẻ input đang target
+      let ipTarget = e.target;
+
+      let check = ipTarget.value.trim() ? true : false;
+
+      if(check){
+        this.objectValidateForm[ipTarget.id] = false;
+      }else{
+        this.objectValidateForm[ipTarget.id] = true;
+      }
+    },
+
+    blurValidateNumber(e){
+      //lấy thẻ input đang target
+      let ipTarget = e.target;
+
+      let check = ipTarget.value.trim() ? true : false;
+      if(Number(ipTarget.value) === 0) {
+        check = false;
+      }else{
+        check = true;
+      }
+
+      if(check){
+        this.objectValidateForm[ipTarget.id] = false;
+      }else{
+        this.objectValidateForm[ipTarget.id] = true;
+      }
+    },
+
+    // Xử lý sự kiện khi blur ô input(component) (ẩn hiện message validate) TH Nguyên giá
+    blurValidateComponentCost(){
+      //Kiểm tra điều kiện giá trị đang trong ô input
+      let check = this.FixedAsset.cost != 0 ? true : false;
+
+      if(check){
+        this.objectValidateForm.cost = false;
+      }else{
+        this.objectValidateForm.cost = true;
+      }
+    },
+    
+    // Xử lý sự kiện khi blur ô input(component) (ẩn hiện message validate) TH Giá trị hao mòn năm
+    blurValidateComponentValueAtrophyYear(){
+      //Kiểm tra điều kiện giá trị đang trong ô input
+      let check = this.FixedAsset.valueAtrophyYear != 0 ? true : false;
+
+      if(check){
+        this.objectValidateForm.valueAtrophyYear = false;
+      }else{
+        this.objectValidateForm.valueAtrophyYear = true;
       }
     },
 
@@ -554,19 +540,45 @@ export default {
     },
 
     /**
-     * Hàm xử lý sự kiện khi thay đổi option thẻ select bộ phận sử dụng
+     * Hàm tự động cập nhật tên bộ phận sử dụng tương ứng mã bộ phận sử dụng
      * Tạo bởi: NVAn(20/12/2022)
      */
-    changeOptionPart(e, departmentName, departmentId) {
-      // Thay đổi value ô input select
-      e.target.parentElement.parentElement.querySelector(".option-filter__content").value = departmentName;
-
+    importDepartment(departmentId){
       // Chọn tên bộ phận tương ứng với mã bộ phận
       for (const department of this.Departments) {
         if (department.departmentId == departmentId) {
           this.FixedAsset.departmentId = departmentId;
         }
       }
+
+      // Khi mã trường đường chọn thì bỏ active
+      this.objectValidateForm.departmentId = false;
+    },
+
+    /**
+     * Hàm tự động cập nhật tên loại tài sản tương ứng mã loại tài sản
+     * Tạo bởi: NVAn(20/12/2022)
+     */
+    importFixedAssetCode(fixedAssetCategoryId){
+      try {
+        for (const assetCategory of this.AssetCategorys) {
+        if (assetCategory.fixedAssetCategoryId == fixedAssetCategoryId) {
+          // Chọn tên loại tài sản tương ứng với mã loại tài sản
+          this.FixedAsset.fixedAssetCategoryId = fixedAssetCategoryId;
+
+          //Chọn số năm sử dụng và tỷ lệ hao mòn theo loại tài sản đó
+          this.FixedAsset.lifeTime = assetCategory.lifeTime;
+          this.FixedAsset.depreciationRate = assetCategory.depreciationRate;
+          this.FixedAsset.trackedYear = assetCategory.useDate.getFullYear();
+
+        }
+      }
+      } catch (error) {
+        console.log(error);
+      }
+
+      // Khi mã trường được chọn thì bỏ active
+      this.objectValidateForm.fixedAssetCategoryId = false;
     },
 
     /**
@@ -591,102 +603,61 @@ export default {
       this.valueAtrophyYearBefor = valueAtrophyYear.value;
     },
 
-    /**
-     * Hàm bắt sự kiện keyup cho nguyên giá
-     * Tạo bởi: NVAn(20/12/2022)
-     */
-    importCost(e) {
-      let cost = this.$refs.cost;
+    // Hàm xử lý nguyên giá
+    importCost(cost){
+      // cập nhật nguyên giá
+      this.FixedAsset.cost = cost;
 
-      //Chỉ cho nhập số
-      if ((e.keyCode >= 48 && e.keyCode <= 57) || e.keyCode === 8) {
-        //format tiền cho nguyên giá
-        cost.value = this.formatCash(
-          this.formatCashReverse(cost.value).toString()
-        );
-
-        //gán giá trị vào cost
-        this.FixedAsset.cost = this.formatCashReverse(cost.value);
-
-        //Tự động tính giá trị hao mòn năm
-        this.autoCalculateValueAtrophyYear();
-
-        // Cập nhật nguyên giá cũ
-        this.costBefor = cost.value;
-      } else {
-        //Nếu nhập không phải số
-
-        // gán value cho giá trị value cũ
-        cost.value = this.formatCash(
-          this.formatCashReverse(this.costBefor).toString()
-        );
-      }
-
-      // console.log("costBefor", this.costBefor);
-      // console.log("FixedAsset.cost", this.FixedAsset.cost);
-      // console.log("cost.value", cost.value);
+      // cập nhật giá trị hao mòn năm
+      this.FixedAsset.valueAtrophyYear = Math.round(this.FixedAsset.cost * this.FixedAsset.depreciationRate / 100);
     },
 
-    /**
-     * Hàm bắt sự kiên keyup cho giá trị hao mòn năm
-     * Tạo bởi: NVAn(20/12/2022)
-     */
-    importValueAtrophyYear(e) {
-      // Lấy thẻ input của giá trị hao mòn năm
-      let valueAtrophyYear = this.$refs.valueAtrophyYear;
+    // Hàm xử lý tỷ lệ hao mòn năm
+    importDepreciationRate(e){
+      // cập nhật tỷ lệ hao mòn năm event.target.value
+      const value = e.target.value
 
-      //Chỉ cho nhập số
-      if ((e.keyCode >= 48 && e.keyCode <= 57) || e.keyCode === 8) {
-        // Nếu nhập số sẽ thực hiện:
-
-        //format tiền cho giá trị hao mòn năm
-        valueAtrophyYear.value = this.formatCash(
-          this.formatCashReverse(valueAtrophyYear.value).toString()
-        );
-
-        //gán giá trị vào giá trị hao mòn năm
-        this.FixedAsset.valueAtrophyYear = this.formatCashReverse(
-          valueAtrophyYear.value
-        );
-
-        // Cập nhật giá trị hao mòn năm cũ
-        this.valueAtrophyYearBefor = valueAtrophyYear.value;
-      } else {
-        //Nếu nhập không phải số
-
-        // gán value cho giá trị value cũ
-        valueAtrophyYear.value = this.formatCash(
-          this.formatCashReverse(this.valueAtrophyYearBefor).toString()
-        );
+      if (value.length <= 2 || Number(value) == 100 ) {
+        //Nếu giá trị value nhỏ hơn hoặc bằng 2 chữ số thì gán giá trị này cho depreciationRate
+        this.FixedAsset.depreciationRate = value;
+      }else{
+        // Nếu giá trị này lớn hơn 2 chữ số thì gán depreciationRate thành 100
+        this.FixedAsset.depreciationRate = 100;
       }
-
-      // console.log(this.valueAtrophyYearBefor);
-      // console.log(valueAtrophyYear.value);
-      // console.log(this.FixedAsset.valueAtrophyYear);
     },
 
-    //Xử lý sự kiện khi thay đổi option thẻ select loại tài sản
-    changeOptionTypeAsset(e, fixedAssetCategoryName, fixedAssetCategoryId) {
-      // Thay đổi value ô input select
-      e.target.parentElement.parentElement.querySelector(".option-filter__content").value =
-        fixedAssetCategoryName;
+    // Hàm xử lý số lượng
+    importQuantity(e){
+      // cập nhật tỷ lệ hao mòn năm
+      const value = e.target.value
 
-      // Chọn tên loại tài sản tương ứng với mã loại tài sản
-      for (const assetCategory of this.AssetCategorys) {
-        if (assetCategory.fixedAssetCategoryId == fixedAssetCategoryId) {
-          this.FixedAsset.fixedAssetCategoryId = fixedAssetCategoryId;
-        }
+      if (value.length <= 5) {
+        //Nếu giá trị value nhỏ hơn hoặc bằng 5 chữ số thì gán giá trị này cho quantity
+        this.FixedAsset.quantity = value;
+      }else{
+        // Nếu giá trị này lớn hơn 5 chữ số thì gán quantity thành 99999
+        this.FixedAsset.quantity = 99999;
       }
+    },
 
-      //Chọn số năm sử dụng và tỷ lệ hao mòn theo loại tài sản đó
-      for (const assetCategory of this.AssetCategorys) {
-        if (assetCategory.fixedAssetCategoryId == fixedAssetCategoryId) {
-          this.FixedAsset.lifeTime = assetCategory.lifeTime;
-          this.FixedAsset.depreciationRate = assetCategory.depreciationRate;
-          this.FixedAsset.trackedYear =
-            this.FixedAsset.useDate.getYear() + 1900;
-        }
+    // Hàm xử lý số năm sử dụng
+    importLifeTime(e){
+      // cập nhật số năm sử dụng
+      const value = e.target.value
+
+      if (value.length <= 3) {
+        //Nếu giá trị value nhỏ hơn hoặc bằng 3 chữ số thì gán giá trị này cho quantity
+        this.FixedAsset.lifeTime = value;
+      }else{
+        // Nếu giá trị này lớn hơn 3 chữ số thì gán quantity thành 100
+        this.FixedAsset.lifeTime = 100;
       }
+    },
+
+    // hàm xử lý giá trị hao mòn năm
+    importValueAtrophyYear(valueAtrophyYear){
+      // Cập nhật giá trị hao mòn năm
+      this.FixedAsset.valueAtrophyYear = valueAtrophyYear;
     },
 
     //Đóng form khi click close
@@ -707,45 +678,60 @@ export default {
     },
 
     // Thêm mới dữ liệu khi lưu
-    addData() {
+    async addData() {
       try {
         // Khai báo các trường cần validate
         let checkValidate = false;
-        checkValidate =
-          this.FixedAsset.fixedAssetCode == false ||
-          this.FixedAsset.fixedAssetName == false ||
-          this.FixedAsset.departmentId == false ||
-          this.FixedAsset.fixedAssetCategoryId == false ||
-          this.FixedAsset.quantity == false ||
-          this.FixedAsset.cost == false ||
-          this.FixedAsset.lifeTime == false ||
-          this.FixedAsset.depreciationRate == false ||
-          this.FixedAsset.valueAtrophyYear == false ||
-          this.FixedAsset.trackedYear == false;
+
+        // Kiểm tra validate
+        if(this.FixedAsset.fixedAssetCode === ""){
+          this.objectValidateForm.fixedAssetCode = true;
+          checkValidate = true;
+        }
+        if(this.FixedAsset.fixedAssetName === ""){
+          this.objectValidateForm.fixedAssetName = true;
+          checkValidate = true;
+        }
+        if(this.FixedAsset.departmentId === ""){
+          this.objectValidateForm.departmentId = true;
+          checkValidate = true;
+        }
+        if(this.FixedAsset.fixedAssetCategoryId == ""){
+          this.objectValidateForm.fixedAssetCategoryId = true;
+          checkValidate = true;
+        }
+        if(this.FixedAsset.quantity == "" || this.FixedAsset.quantity === 0){
+          this.objectValidateForm.quantity = true;
+          checkValidate = true;
+        }
+        if(this.FixedAsset.depreciationRate == "" || this.FixedAsset.depreciationRate === 0){
+          this.objectValidateForm.depreciationRate = true;
+          checkValidate = true;
+        }
+        if(this.FixedAsset.lifeTime == "" || this.FixedAsset.lifeTime === 0){
+          this.objectValidateForm.lifeTime = true;
+          checkValidate = true;
+        }
+        if(this.FixedAsset.cost == "" || this.FixedAsset.cost === 0){
+          this.objectValidateForm.cost = true;
+          checkValidate = true;
+        }
+        if(this.FixedAsset.valueAtrophyYear == "" || this.FixedAsset.valueAtrophyYear === 0){
+          this.objectValidateForm.valueAtrophyYear = true;
+          checkValidate = true;
+        }
+
+        // Kiểm tra nghiệp vụ
+        // if(this.FixedAsset.depreciationRate != Number(100/this.FixedAsset.lifeTime).toFixed(2)){
+        //   major = 1;
+        // }
 
         // Kiểm tra validate ở các trường
         if (checkValidate) {
-          this.isShowDialogValidate = !this.isShowDialogValidate;
-          this.validateItems = [];
-
-          if (this.FixedAsset.fixedAssetCode === "")
-            this.validateItems.push("Mã tài sản");
-          if (this.FixedAsset.fixedAssetName === "")
-            this.validateItems.push("Tên tài sản");
-          if (this.FixedAsset.departmentId === "")
-            this.validateItems.push("Mã bộ phận sử dụng");
-          if (this.FixedAsset.fixedAssetCategoryId === "")
-            this.validateItems.push("Mã loại tài sản");
-          if (this.FixedAsset.quantity === 0)
-            this.validateItems.push("Số lượng");
-          if (this.FixedAsset.cost === 0) this.validateItems.push("Nguyên giá");
-          if (this.FixedAsset.valueAtrophyYear === 0)
-            this.validateItems.push("Giá trị hao mòn năm");
-          if (this.FixedAsset.lifeTime === 0)
-            this.validateItems.push("Số năm sử dụng");
-          if (this.FixedAsset.depreciationRate === 0)
-            this.validateItems.push("Tỷ lệ hao mòn");
-        } else {
+          this.modeRequest = Enum.ModeRequest.ValidateEmpty;
+          this.isShowDialogValidate = true;
+          
+        }else {
           //Kiểm tra xem thuộc loại form mode nào
           switch (this.mode) {
             case Enum.Mode.Update:
@@ -759,54 +745,84 @@ export default {
                     departmentId: this.FixedAsset.departmentId,
                     fixedAssetCategoryId: this.FixedAsset.fixedAssetCategoryId,
                     purchaseDate: this.FixedAsset.purchaseDate,
+                    useDate: this.FixedAsset.useDate,
                     cost: this.FixedAsset.cost,
+                    valueAtrophyYear: this.FixedAsset.valueAtrophyYear,
                     quantity: this.FixedAsset.quantity,
                     depreciationRate: this.FixedAsset.depreciationRate,
                     trackedYear: this.FixedAsset.trackedYear,
-                    lifeTime: this.lifeTime,
-                    productionYear: this.productionYear,
-                    valueAtrophyYear: this.valueAtrophyYear,
-                    createdBy: "string",
+                    lifeTime: this.FixedAsset.lifeTime,
+                    productionYear: this.FixedAsset.productionYear,
+                    createdBy: "Hoàng Tô Nghĩa",
                     createdDate: "2022-12-26T17:50:33.580Z",
-                    modifiedBy: "string",
+                    modifiedBy: "Trung Văn Kiên",
                     modifiedDate: "2022-12-26T17:50:33.580Z",
                   }
                 )
                 .then((res) => {
                   console.log(res);
-                  this.$emit("onShowToastSuccess");
+                })
+                .catch((res) =>{
+                  this.handleErrorApi(res.response.data.errorCode);
                 });
+
+              this.$emit("onShowToastSuccess");
               this.canceForm();
               break;
 
             // Mặc định sẽ là thêm mới
             default:
-              axios
-                .post("http://localhost:63515/api/v1/Assets", {
-                  fixedAssetId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                  fixedAssetCode: this.FixedAsset.fixedAssetCode,
-                  fixedAssetName: this.FixedAsset.fixedAssetName,
-                  departmentId: this.FixedAsset.departmentId,
-                  fixedAssetCategoryId: this.FixedAsset.fixedAssetCategoryId,
-                  purchaseDate: this.FixedAsset.purchaseDate,
-                  cost: this.FixedAsset.cost,
-                  quantity: this.FixedAsset.quantity,
-                  depreciationRate: this.FixedAsset.depreciationRate,
-                  trackedYear: this.FixedAsset.trackedYear,
-                  lifeTime: this.lifeTime,
-                  productionYear: this.productionYear,
-                  valueAtrophyYear: this.valueAtrophyYear,
-                  createdBy: "string",
-                  createdDate: "2022-12-26T17:50:33.580Z",
-                  modifiedBy: "string",
-                  modifiedDate: "2022-12-26T17:50:33.580Z",
-                })
-                .then((res) => {
-                  console.log(res);
-                });
-              console.log(this.FixedAsset);
-              this.$emit("onShowToastSuccess");
-              this.canceForm();
+              // Biến kiểm tra mã trùng
+              var checkCodeMiddle = true;
+              // Response trả về
+              var response;
+              var checkMajor = (this.FixedAsset.depreciationRate == Math.round(100/this.FixedAsset.lifeTime));
+              console.log(checkMajor);
+
+              if (checkMajor) {
+                await axios.post("http://localhost:63515/api/v1/Assets", {
+                    fixedAssetId: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                    fixedAssetCode: this.FixedAsset.fixedAssetCode,
+                    fixedAssetName: this.FixedAsset.fixedAssetName,
+                    departmentId: this.FixedAsset.departmentId,
+                    fixedAssetCategoryId: this.FixedAsset.fixedAssetCategoryId,
+                    purchaseDate: this.FixedAsset.purchaseDate,
+                    useDate: this.FixedAsset.useDate,
+                    cost: this.FixedAsset.cost,
+                    valueAtrophyYear: this.FixedAsset.valueAtrophyYear,
+                    quantity: this.FixedAsset.quantity,
+                    depreciationRate: this.FixedAsset.depreciationRate,
+                    trackedYear: this.FixedAsset.trackedYear,
+                    lifeTime: this.FixedAsset.lifeTime,
+                    productionYear: this.FixedAsset.productionYear,
+                    createdBy: "Hoàng Tô Nghĩa",
+                    createdDate: "2022-12-26T17:50:33.580Z",
+                    modifiedBy: "Trung Văn Kiên",
+                    modifiedDate: "2022-12-26T17:50:33.580Z",
+                  })
+                  .then((res) => {
+                    response = res.response;
+                    checkCodeMiddle = false;
+                  })
+                  .catch((res) =>{
+                    response = res.response;
+                    checkCodeMiddle = true;
+                  });   
+
+                  if (checkCodeMiddle) {
+                    if(response.data.errorCode == Enum.ErrorCode.ValidateCodeError){
+                      this.modeRequest = Enum.ModeRequest.ExistCode;
+                      this.isShowDialogValidate = true;
+                    }
+                  }else{
+                    this.$emit("onShowToastSuccess");
+                    this.canceForm();
+                  }
+              } else {
+                this.modeRequest = Enum.ModeRequest.CheckDepreciationRateLifeTime;
+                this.isShowDialogValidate = true;
+              }
+               
               break;
           }
         }
@@ -864,12 +880,35 @@ export default {
 
     //Truyền giá trị tài sản ban đầu vào form
     CreateFormUpdate(updateAsset) {
-      this.FixedAsset = updateAsset;
+      this.FixedAsset.fixedAssetId = updateAsset.fixedAssetId;
+      this.FixedAsset.fixedAssetCode = updateAsset.fixedAssetCode;
+      this.FixedAsset.fixedAssetName = updateAsset.fixedAssetName;
+      this.FixedAsset.departmentId = updateAsset.departmentId;
+      this.FixedAsset.fixedAssetCategoryId = updateAsset.fixedAssetCategoryId;
+      this.FixedAsset.purchaseDate = updateAsset.purchaseDate;
+      this.FixedAsset.useDate = updateAsset.useDate;
+      this.FixedAsset.cost = updateAsset.cost;
+      this.FixedAsset.quantity = updateAsset.quantity;
+      this.FixedAsset.depreciationRate = updateAsset.depreciationRate;
+      this.FixedAsset.trackedYear = updateAsset.trackedYear;
+      this.FixedAsset.lifeTime = updateAsset.lifeTime;
+      this.FixedAsset.productionYear = updateAsset.productionYear;
+      this.FixedAsset.valueAtrophyYear = updateAsset.valueAtrophyYear;
     },
 
     //Truyền giá trị tài sản ban đầu vào form
     CreateFormDuplicate(duplicateAsset) {
       this.FixedAsset = duplicateAsset;
+    },
+
+    // Xử lý Error API trả về
+    handleErrorApi(errorCode){
+      console.log("Mã lỗi: ", errorCode);
+    },
+
+      // Xử lý hành động đóng dialog validate
+    closeDialogValidate(){
+      this.isShowDialogValidate = false;
     },
   },
 };
@@ -944,7 +983,7 @@ export default {
 }
 
 .form-add__container__head .icon-close {
-  background: url("../../assets/icon/qlts-icon.png") no-repeat -375px -287px;
+  background: url("../../../assets/icon/qlts-icon.png") no-repeat -375px -287px;
   width: 18px;
   height: 18px;
   cursor: pointer;
@@ -1014,8 +1053,12 @@ export default {
   width: 100%;
 }
 
-.col-select:hover {
+.col-select:hover, .col-select:focus, .col-select:active {
   border-color: #1aa4c8;
+}
+
+.col-select:focus-visible{
+  /* border-color: #1aa4c8; */
 }
 
 .option-filter__content {
@@ -1029,7 +1072,7 @@ export default {
 }
 
 .select-option.icon-down {
-  background: url("../../assets/icon/qlts-icon.png") no-repeat -62px -330px;
+  background: url("../../../assets/icon/qlts-icon.png") no-repeat -62px -330px;
   width: 20px;
   height: 20px;
   margin: 7px;
@@ -1069,7 +1112,7 @@ export default {
 }
 
 .icon-datepicker {
-  background: url("../../assets/icon/qlts-icon.png") no-repeat -287px -67px;
+  background: url("../../../assets/icon/qlts-icon.png") no-repeat -287px -67px;
   width: 18px;
   height: 18px;
   position: relative;
@@ -1082,31 +1125,51 @@ export default {
   height: 82px;
   background-color: rgb(227, 227, 227);
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
 .form-add__container__foot .btn-submit {
   width: 100px;
   height: 36px;
   margin: 12px 24px 12px 12px;
+  outline: none;
+  border: none;
   line-height: 36px;
   text-align: center;
   background-color: #1aa4c8;
   border-radius: 2px;
-  color: #ffffff;
+  color: #fff;
   cursor: pointer;
 }
 
+.form-add__container__foot .btn-submit:hover,
+.form-add__container__foot .btn-submit:focus-visible{
+  background-color: #1688A6;
+
+}
+
+.form-add__container__foot .btn-submit:focus-visible{
+  border: none;
+}
+
 .form-add__container__foot .btn-cancel {
+  border: none;
+  outline: none;
   width: 100px;
   height: 36px;
   margin: 12px 0 12px 12px;
   line-height: 36px;
   text-align: center;
-  background-color: #fff;
+  background-color: #FBFBFB;
   border-radius: 2px;
   color: #000;
   cursor: pointer;
+}
+
+.form-add__container__foot .btn-cancel:hover, 
+.form-add__container__foot .btn-cancel:focus-visible{
+  background-color: #1aa4c8;
 }
 
 .form-group {
@@ -1131,6 +1194,10 @@ export default {
   padding-right: 20px !important;
 }
 
+.padding-right-32{
+  padding-right: 32px !important;
+}
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -1151,6 +1218,60 @@ input[type="number"]::-webkit-outer-spin-button {
 
 ::-webkit-scrollbar-thumb {
   background: #ccc;
+}
+
+.padding-0{
+  padding: 0 !important;
+}
+
+.input-number{
+    position: relative;
+}
+
+.input-number__class{
+    height: 36px;
+    margin-top: 8px;
+    padding-right: 32px;
+    font-size: 14px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    border: 1px solid #b3b3b3;
+    border-radius: 3px;
+    outline: none;
+    width: 100%;
+    text-align: right;
+    flex: 1;
+}
+
+.input-number__class:hover{
+    border-color: #1aa4c8;
+}
+
+.input-number .icon-up{
+    
+}
+
+.input-number .icon-UpAndDown{
+    background: url("@/assets/icon/qlts-icon.png") no-repeat -204px -332px;
+    width: 10px;
+    height: 20px;
+    position: absolute;
+    top: 18px;
+    right: 9px;
+}
+
+.input-money{
+  border: 1px solid #b3b3b3;
+  border-radius: 3px;
+  margin-top: 8px;
+}
+
+.active_ip{
+  border: 1px solid #f33a58 !important;
+}
+
+.input-money:hover{
+  border-color: #1aa4c8;
 }
 </style>
 

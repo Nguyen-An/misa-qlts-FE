@@ -6,11 +6,27 @@ export default {
       DeleteMulti: 3, // Xóa nhiều bản ghi 
       Duplicate: 4, // Nhân bản
       ModeDeleteOne: 5, // xóa 1
-      ModeDelete: 6 // xóa nhiều theo tích
+      ModeDelete: 6, // xóa nhiều theo tích
+      ValueEmpty: 7 // Xóa nhiều nhưng chưa có ô nào được chọn
     },
-    Type: {
-      Main: 1, // Button chính
-      Secondary: 2, // Button phụ
+    ModeRequest: {
+      ValidateEmpty: 1, // Validate trống
+      ExistCode: 2, // Mã tài sản đã tồn tại
+      CheckDepreciationRateLifeTime: 3, // tỷ lệ hao mòn phải bằng 1/số năm sử dụng
+    },
+    ModeInput: {
+      cost: 1,
+      valueAtrophyYear: 2,
+      quantity: 3,
+      depreciationRate: 4,
+    },
+    ModeType: {
+      AssetCategory: 1,
+      Department: 2
+    },
+    ErrorCode: {
+      BadRequest: 4, // Yêu cầu đầu vào không hợp lệ
+      ValidateCodeError: 5, // Mã tài sản đã tồn tại
     },
     DlgType: {
       RequiredInfo: 0, // Thông tin bắt buộc
@@ -39,9 +55,5 @@ export default {
       Money: 2, // Kiểu tiền
       Year: 3, // Kiểu năm (thời gian)
       Rate: 4, // Kiểu tỉ lệ
-    },
-    ErrorCode: {
-      DuplicateKey: 4,
-      BadRequest: 3,
     },
   };

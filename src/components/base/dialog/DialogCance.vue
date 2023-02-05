@@ -8,12 +8,8 @@
         <div class="container__right">
           <div class="container__content">
             <div class="validate-items">
-              <div
-                class="validate-item"
-                v-for="listValidateIt in listValidateIts"
-                :key="listValidateIt"
-              >
-                {{ listValidateIt }} {{ContentText.NotNull}}
+              <div class="validate-item">
+                {{ ContentText.AddFall }}
               </div>
             </div>
           </div>
@@ -99,7 +95,7 @@ export default {
 }
 
 .icon-warning {
-  background: url("../../assets/icon/qlts-icon.png") no-repeat -824px -130px;
+  background: url("../../../assets/icon/qlts-icon.png") no-repeat -824px -130px;
   background-size: 1000px 1500px;
   width: 48px;
   height: 40px;

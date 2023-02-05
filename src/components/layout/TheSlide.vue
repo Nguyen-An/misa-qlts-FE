@@ -121,14 +121,13 @@ export default {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 90px);
-  margin-top: 34px;
 }
 
 .slide__category {
   display: flex;
   border-radius: 6px;
   height: 40px;
-  margin: 2px 6px 2px 6px;
+  margin: 2px 6px;
 }
 
 .active {
@@ -201,12 +200,12 @@ export default {
   background: url("../../assets/icon/qlts-icon.png") no-repeat -158px -275px;
   width: 11px;
   height: 40px;
-  margin-right: 6px;
+  margin-right: 10px;
 }
 
 .slide__btn-open-close {
   height: 40px;
-  border-top: 2px solid #afafaf;
+  border-top: 2px solid #32445a;
 }
 
 .icon-open {

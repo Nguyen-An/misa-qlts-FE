@@ -6,7 +6,6 @@
           <TheSlide></TheSlide>
         </div>
       </div>
-
       <div class="container__right">
         <div class="nav">
           <TheHeader></TheHeader>
@@ -24,7 +23,7 @@ import TheHeader from "./components/layout/TheHeader.vue";
 import TheMain from "./components/layout/TheMain.vue";
 import TheSlide from "./components/layout/TheSlide.vue";
 
-export default {
+export default{
   name: "App",
   components: {
     TheHeader,

@@ -8,7 +8,7 @@
         <div class="container__right">
           <div class="container__content">
             <div class="validate-items">
-              <div class="validate-item">Không được để trống các trường</div>
+              <div class="validate-item">{{ Title }}</div>
             </div>
           </div>
           <div class="container__footer">
@@ -24,6 +24,7 @@
 
 <script>
 import Resource from "@/js/resource.js";
+import Enum from "@/js/enum.js";
 
 export default {
   name: "dialogValidate",
@@ -31,18 +32,37 @@ export default {
   props: {
     // Chế độ của popup
     validateItems: Array,
-    isShowDialogValidate: Boolean,
+    modeRequest: Number,
   },
   data() {
     return {
       ContentText: Resource.ContentText, //Table content gọi từ file resource.js
       listValidateIts: this.validateItems,
+      Title: "",
     };
   },
-  created() {},
+  created() {
+    switch (this.modeRequest) {
+      case Enum.ModeRequest.ExistCode:
+        this.Title = "Mã tài sản đã tồn tại"
+        break;
+
+      case Enum.ModeRequest.ValidateEmpty:
+        this.Title = "Không được để trống các trường"
+        break;
+
+      case Enum.ModeRequest.CheckDepreciationRateLifeTime:
+        this.Title = "Tỷ lệ hao mòn phải bằng 1/số năm sử dụng"
+      break;
+      
+      default:
+
+        break;
+    }
+  },
   methods: {
     closeDialog() {
-      document.querySelector(".black-bg").style.display = "none";
+      this.$emit('closeDialog');
     },
   },
 };
@@ -79,6 +99,7 @@ export default {
   z-index: 100;
   overflow: hidden;
   padding: 24px;
+  border-radius: 6px;
 }
 
 .dialog-validate__container {
@@ -108,7 +129,7 @@ export default {
 }
 
 .icon-warning {
-  background: url("../../assets/icon/qlts-icon.png") no-repeat -824px -130px;
+  background: url("../../../assets/icon/qlts-icon.png") no-repeat -824px -130px;
   background-size: 1000px 1500px;
   width: 48px;
   height: 40px;

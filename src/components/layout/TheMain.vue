@@ -12,54 +12,21 @@
           />
         </div>
         <div class="option-filter">
-          <div class="icon-filter"></div>
-          <input
-            @click="showOption($event)"
-            class="option-filter__content"
-            value=""
-            :placeholder="Placeholder.CategoryAsset"
-          />
-          <!-- @keyup="searchFilter($event, 'AssetCategory')" -->
-          <div class="icon-down" @click="showOption($event)"></div>
-          <div class="option-filter-items">
-            <div
-              class="option-filter-item"
-              ref="optionFilteritem"
-              v-for="(AssetCategory, index) in AssetCategorys"
-              :key="index"
-              @click="
-                changeOption(
-                  $event,
-                  AssetCategory.fixedAssetCategoryName,
-                  AssetCategory.fixedAssetCategoryId,
-                  'AssetCategorys'
-                )
-              "
-            >
-              {{ AssetCategory.fixedAssetCategoryName }}
-            </div>
-          </div>
+          <input-Filter :modeFilter="1" @filter="filterCategoryAsset"/>
         </div>
         <div class="option-filter">
-          <div class="icon-filter"></div>
-          <input @click="showOption($event)" class="option-filter__content" :placeholder="Placeholder.Department" readonly/>
-          <div class="icon-down" @click="showOption($event)"></div>
-          <div class="option-filter-items">
-            <div class="option-filter-item" ref="optionFilteritem" 
-            v-for="(part, index) in Departments" :key="index" 
-            @click=" changeOption($event,part.departmentName,part.departmentId,'Departments')">
-              {{ part.departmentName }}
-            </div>
-          </div>
+          <input-Filter :modeFilter="2" @filter="filterDepartment"/>
         </div>
       </div>
       <div class="content__option__right">
         <div class="content__option__right__btn-add-asset" @click="ShowFormAdd">
           {{ Title.AddAsset }}
         </div>
-        <div class="content__option__right_btn">
-          <div class="icon-updt" :title="Tooltip.ExportTooltip"></div>
-        </div>
+        <export-excel :data="json_data" :name="'qlts.xls'">
+          <div class="content__option__right_btn">
+            <div class="icon-updt" :title="Tooltip.ExportTooltip"></div>
+          </div>
+        </export-excel>
         <div class="content__option__right_btn">
           <div
             id="delete"
@@ -104,8 +71,8 @@
               class="table-start"
               v-for="(asset, index) in assets"
               :key="index"
-              @dblclick="ShowFormUpdate(asset)"
               @click="activeRecord($event)"
+              @dblclick="ShowFormUpdate(asset)"
             >
               <td class="ta-left">
                 <input
@@ -213,7 +180,7 @@
         </tfoot>
       </table>
     </div>
-    <form-mode
+    <FormMode
       @onShowToastSuccess="showToastSuccess"
       v-if="isShowForm"
       :mode="mode"
@@ -230,28 +197,31 @@
     />
     <dialogLoading v-if="isShowDialogLoading" />
     <toastSuccess v-if="isShowToastSuccess" />
-    <toastDelete v-if="isShowToastDelete" />
+    <toastFail v-if="isShowToastDelete" />
   </div>
 </template>
 <script>
+
 import axios from "axios";
-import formMode from "../popup/formMode.vue";
+import FormMode from "@/components/base/popup/FormMode";
+import inputFilter from '@/components/base/popup/InputFilter'
 import Enum from "@/js/enum.js";
 import Resource from "@/js/resource.js";
-import toastSuccess from "@/components/toast-message/toastSuccess.vue";
-import dialogDelete from "@/components/dialog/dialogDelete.vue";
-import dialogLoading from "@/components/dialog/dialogLoading.vue";
-import toastDelete from "@/components/toast-message/toastDelete.vue";
+import toastSuccess from "@/components/base/toast-message/ToastSuccess";
+import dialogDelete from "@/components/base/dialog/DialogDelete";
+import dialogLoading from "@/components/base/dialog/DialogLoading";
+import toastFail from "@/components/base/toast-message/ToastFail";
 import { APIFilter } from "@/class/APIFilter.js";
 // import { Department } from "@/class/Department.js";
 
 export default {
   components: {
-    formMode,
+    FormMode,
     toastSuccess,
     dialogDelete,
     dialogLoading,
-    toastDelete,
+    toastFail,
+    inputFilter
   },
   name: "TheMain",
   data() {
@@ -265,7 +235,7 @@ export default {
       updateAsset: {}, // tài sản truyền vào form cập nhật tài sản
       assets: [], // Danh sách tài sản lấy từ API
       AssetCategorys: [], // Danh sách loại tìa sản lấy từ API
-      FilterAssetCategorys: [],
+      FilterAssetCategorys: [], // Danh sách loại tìa sản lấy từ API
       Departments: [], // Danh sách bộ phận sử dụng lấy từ API
       isShowForm: false, // Ẩn hiện form
       APIFixedAssetFilter: new APIFilter(), // Đối tượng truyền vài api tài sản
@@ -284,27 +254,30 @@ export default {
       APIFixedAssetCategory: "", // chuỗi API lấy danh sách loại tài sản
       totalPage: 0, // Tổng số trang
       currenPage: 1, // Trang hiện tại đang xuất hiện
-      assetIdDelete: "" // Id asset khi xóa trên dòng
+      assetIdDelete: "", // Id asset khi xóa trên dòng
+      json_fields: {
+            'STT': 'name',
+            'Mã tài sản': 'city',
+            'Tên tài sản': 'phone.mobile',
+            'Tên loại tài sản': 'phone.mobile',
+            'Bộ phận sử dụng': 'phone.mobile',
+            'Số lượng': 'phone.mobile',
+            'Nguyên giá': 'phone.mobile',
+            'HM/KH lũy kế': 'phone.mobile',
+            'Giá trị còn lại': 'phone.mobile',
+      },
+      json_data: [],
+      json_meta: [
+            [
+                {
+                    'key': 'charset',
+                    'value': 'utf-8'
+                }
+            ]
+      ],
     };
   },
   created() {
-    var _this = this;
-
-    // Sự kiện khi click ra ngoài thì đóng thẻ select
-    window.addEventListener("click", function () {
-      try {
-        // Chon tất cả thẻ option
-        let listSelectControl = _this.$refs.optionFilteritem;
-
-        // Ẩn hết toàn bộ thẻ select đang mở
-        for (const selectControl of Array.from(listSelectControl)) {
-          selectControl.style.display = "none";
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    });
-
     // Cài đặt API lấy tài sản
     this.APIFixedAsset =
       "http://localhost:63515/api/Assets/filter?keyword=" +
@@ -328,6 +301,8 @@ export default {
     this.loadData();
   },
   updated() {
+
+
     // Cài đặt API lấy tài sản
     this.APIFixedAsset =
       "http://localhost:63515/api/Assets/filter?keyword=" +
@@ -378,7 +353,7 @@ export default {
         pages[1].insertAdjacentHTML("afterend", html);
       }
     }
-
+    
   },
   methods: {
     // Cập nhật API lấy tài sản
@@ -401,6 +376,7 @@ export default {
     getAPIDepartment() {
       return "http://localhost:63515/api/v1/Departments/filter?keyword=";
     },
+
     // Cập nhật API lấy danh sách loại tài sản
     getAPIFixedAssetCategory() {
       return "http://localhost:63515/api/AssetCategorys/filter?keyword=" + this.APIAssetCategoryFilter.keyword;
@@ -409,10 +385,6 @@ export default {
     /**
      * Hàm format tiền str: String
      * Tạo bởi: NVAn(20/12/2022)
-     */
-
-    /**
-     *
      */
     formatCash(str) {
       return str
@@ -456,12 +428,14 @@ export default {
               return response.json();
             })
             .then((AssetCategory) => {
-              if(AssetCategory.data == null){
-                this.AssetCategorys = [];
-              }else{
-                this.FilterAssetCategorys = AssetCategory.data;
                 this.AssetCategorys = AssetCategory.data;
-              }
+                this.FilterAssetCategorys = AssetCategory.data.map(function(assetCategory){
+                  return {
+                    id: assetCategory.fixedAssetCategoryId,
+                    code: assetCategory.fixedAssetCategoryCode,
+                    name: assetCategory.fixedAssetCategoryName
+                  }
+                });
             });
         } catch (error) {
           console.log(error);
@@ -479,8 +453,17 @@ export default {
       } catch (error) {
         console.log(error);
       }
+      
+      let _this = this;
+      setTimeout(function(){
+        try {
+          // Cập nhật json-data
+        _this.updateJsonData();
+        } catch (error) {
+          console.log(error);
+        }
+      }, 1000);
     },
-
 
     /**
      * Hàm hàm lấy ra tên loại tài sản tương ứng với mã tài sản truyền vào
@@ -505,6 +488,30 @@ export default {
         if (Part.departmentId === departmentId) {
           return Part.departmentName;
         }
+      }
+    },
+
+    updateJsonData(){
+      let _this = this;
+      let stt = 1;
+      // Cập nhật data json_data
+      _this.json_data = [];
+
+      for (const asset of this.assets) {
+        let rowData;
+        rowData = {
+          'STT': stt,
+          'Mã tài sản': asset.fixedAssetCode,
+          'Tên tài sản': asset.fixedAssetName,
+          'Tên loại tài sản': _this.getNameAssetCategory(asset.fixedAssetCategoryId),
+          'Bộ phận sử dụng': _this.getNamePart(asset.departmentId),
+          'Số lượng': asset.quantity,
+          'Nguyên giá': _this.formatCash(asset.cost.toString()),
+          'HM/KH lũy kế': _this.formatCash(_this.getAccumulated(asset.cost, asset.depreciationRate).toString()),
+          'Giá trị còn lại': _this.formatCash(_this.getResidualValue(asset.cost,asset.depreciationRate).toString()),
+        }
+        stt++;
+        _this.json_data.push(rowData)
       }
     },
 
@@ -567,9 +574,10 @@ export default {
      * Tạo bởi: NVAn(20/12/2022)
      */
     showToastSuccess() {
-      this.isShowToastSuccess = true;
-
-      this.loadData();
+      setTimeout(() => {
+        this.isShowToastSuccess = true;
+        this.loadData();
+      }, 500);
 
       setTimeout(() => {
         this.isShowToastSuccess = false;
@@ -586,71 +594,6 @@ export default {
       setTimeout(() => {
         this.isShowToastDelete = false;
       }, 3000);
-    },
-
-    /**
-     * Sự kiện tạo thẻ select(blur và ra sẽ hiện option)
-     * Tạo bởi: NVAn(20/12/2022)
-     */
-    showOption(e) {
-      try {
-        e.stopImmediatePropagation(); 
-        let selectControls = e.target.parentElement.querySelectorAll(".option-filter-item");
-        for (const selectControl of selectControls) {
-          selectControl.style.display = "flex";
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-
-    /**
-     * Xử lý sự kiện khi search Filter
-     * Tạo bởi: NVAn(20/12/2022)
-     */
-    searchFilter(e, type){
-      if(type === 'AssetCategory'){
-        // cài đặt api 
-        this.APIAssetCategoryFilter.keyword = e.target.value;
-
-      // let selectControlss = e.target.parentElement.querySelectorAll(".option-filter-item");
-      // for (const selectControl of selectControlss) {
-      //   selectControl.style.display = "none";
-      // }
-
-        // load danh sách loại tài sản
-        this.FilterAssetCategorys = this.AssetCategorys.filter(function(FilterAssetCategory){
-          if(FilterAssetCategory.fixedAssetCategoryName.indexOf(e.target.value.trim()) != -1){
-            return FilterAssetCategory;
-          }
-        });
-
-      }
-
-      let selectControls = e.target.parentElement.querySelectorAll(".option-filter-item");
-      for (const selectControl of selectControls) {
-        selectControl.style.display = "flex";
-      }
-
-    },
-
-    /**
-     * Xử lý sự kiện khi thay đổi option thẻ select
-     * Tạo bởi: NVAn(20/12/2022)
-     */
-    changeOption(e, value, id, type) {
-      // đặt lại value ô filter
-      e.target.parentElement.parentElement.querySelector(".option-filter__content").value = value;
-
-      //check xem type là kiểu nào rồi thay đổi api fixed asset
-      if (type == "AssetCategorys") {
-        this.APIFixedAssetFilter.fixedAssetCategoryId = id;
-      } else if (type == "Departments") {
-        this.APIFixedAssetFilter.departmentId = id;
-      }
-
-      this.APIFixedAssetFilter.offset = 0;
-      this.loadData();
     },
 
     /**
@@ -678,8 +621,26 @@ export default {
      * Tạo bởi: NVAn(20/12/2022)
      */
     checkDeleteData() {
-      this.modeDelete = Enum.Mode.ModeDelete;
-      this.isShowDialogDelete = true;
+      let ipCheckboxs = this.$refs.ipCheckbox;
+      let checkOnlyOne = false;
+
+      // Kiểm tra xem có ô nào chưa tích không
+      for (const ipCheckbox of ipCheckboxs) {
+        if(ipCheckbox.checked == true){
+          checkOnlyOne = true;
+          break;
+        }
+      }
+
+      if(checkOnlyOne){
+        // Nếu như có ít nhất 1 ô đã tích => thực hiện xóa nhiều
+        this.modeDelete = Enum.Mode.ModeDelete;
+        this.isShowDialogDelete = true;
+      }else{
+        // Nếu như chưa có ô nào tích => show cảnh báo chưa có ô nào được chọn
+        this.modeDelete = Enum.Mode.ValueEmpty;
+        this.isShowDialogDelete = true;
+      }
     },
 
     deleteDataInline(fixedAssetId){
@@ -777,6 +738,20 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+
+    // Bắt sự kiện lọc loại tài sản
+    filterCategoryAsset(fixedAssetCategoryId){
+      this.APIFixedAssetFilter.fixedAssetCategoryId = fixedAssetCategoryId;
+
+      this.loadData();
+    },
+
+    // Bắt sự kiện lọc bộ phận sử dụng
+    filterDepartment(departmentId){
+      this.APIFixedAssetFilter.departmentId = departmentId;
+
+      this.loadData();
     },
 
     // Bắt sự kiện khi thay đổi page
@@ -946,12 +921,28 @@ export default {
     activeRecord(e){
       try {
         if(e.target.type != "checkbox"){
+          // Lấy danh sách toàn bộ các ô input checkbox
+          let listIpCheckbox = this.$refs.ipCheckbox;
+
+          // Lấy input checkbox hiện tại đang thực hiện click vào
           let ipCheckbox = e.target.parentElement.querySelector(".ip-checkbox");
 
+          // Lưu lại trang thái của hàng đang thwucj hiện click
+          let currenInputCheckbox = false;
           if(ipCheckbox.checked === true){
+            currenInputCheckbox = true;
+          }else{
+            currenInputCheckbox = false;
+          }
+
+          // Tắt toàn bộ active các ô input khác
+          for (const ipCheckbox of listIpCheckbox) {
             ipCheckbox.checked = false;
             ipCheckbox.parentElement.parentElement.classList.remove("active-checked");
-          }else{
+          }
+
+          // Nếu ban đâu ô input đang chưa active thì active nó lên
+          if(currenInputCheckbox === false){
             ipCheckbox.checked = true;
             ipCheckbox.parentElement.parentElement.classList.add("active-checked");
           }
@@ -1245,7 +1236,7 @@ select {
 }
 
 .mandate {
-  padding: 0 18px;
+  padding: 7px 18px 0 18px;
 }
 
 .icon-delete {
@@ -1268,6 +1259,10 @@ select {
   background-color: #fff;
 }
 
+.bg-icon:hover{ 
+    box-shadow: rgb(0 0 0 / 50%) 0px 5px 15px;
+}
+
 .icon-duplicate {
   background: url(http://localhost:8080/img/qlts-icon.c1b7328e.svg) no-repeat -461px -108px;
   width: 24px;
@@ -1288,7 +1283,7 @@ select {
 }
 
 ::-webkit-scrollbar {
-  width: 3px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1305,7 +1300,7 @@ select {
 }
 
 .table-body{
-  height: 500px;
+  height: calc(100vh - 234px);
   overflow: auto;
 }
 
@@ -1313,18 +1308,31 @@ select {
   width: 100%;
   font-size: 14px;
   height: 38px;
-  padding: 9px 0 0px;
   display: flex;
   justify-content: space-between;
 }
+
+thead .table-start,
+tfoot .table-start{
+  padding: 9px 0 0px;
+}
+
+tbody .table-start{
+  line-height: 38px;
+}
+
 
 .table-start-not-valid{
   width: 100%;
   font-size: 14px;
   height: 100%;
-  line-height: 500px;
+  line-height: 510px;
   text-align: center;
   align-items: center;
+}
+
+.table-start-not-valid:hover{
+  background-color: #fff !important;
 }
 
 thead {
